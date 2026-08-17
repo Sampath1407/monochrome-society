@@ -650,6 +650,12 @@ def submit_artwork():
 # START
 # ======================================================
 
+# Initialize database
+init_db()
+
+
 if __name__ == "__main__":
-    init_db()
-    app.run(debug=True)
+
+    app.run(
+        debug=True
+    )

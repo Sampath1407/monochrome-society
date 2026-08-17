@@ -1,8 +1,15 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
+from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import os
 
+
 app = Flask(__name__)
+
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "monochrome-development-secret-key"
+)
 
 DATABASE = "monochrome.db"
 
@@ -66,6 +73,28 @@ def init_db():
 
     connection = get_db()
 
+    # --------------------------------------------------
+    # USERS
+    # --------------------------------------------------
+
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            username TEXT UNIQUE NOT NULL,
+
+            email TEXT UNIQUE NOT NULL,
+
+            password TEXT NOT NULL
+
+        )
+    """)
+
+    # --------------------------------------------------
+    # STORIES
+    # --------------------------------------------------
+
     connection.execute("""
         CREATE TABLE IF NOT EXISTS stories (
 
@@ -81,6 +110,10 @@ def init_db():
 
         )
     """)
+
+    # --------------------------------------------------
+    # SUBMISSIONS
+    # --------------------------------------------------
 
     connection.execute("""
         CREATE TABLE IF NOT EXISTS submissions (
@@ -114,7 +147,234 @@ def init_db():
 @app.route("/")
 def home():
 
-    return render_template("index.html")
+    return render_template(
+        "index.html"
+    )
+
+
+# ======================================================
+# SIGN UP
+# ======================================================
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+
+    if request.method == "POST":
+
+        username = request.form.get(
+            "username",
+            ""
+        ).strip()
+
+        email = request.form.get(
+            "email",
+            ""
+        ).strip()
+
+        password = request.form.get(
+            "password",
+            ""
+        )
+
+        # --------------------------------------------------
+        # VALIDATION
+        # --------------------------------------------------
+
+        if not username or not email or not password:
+
+            return render_template(
+                "signup.html",
+                error="Please fill in all fields."
+            )
+
+        connection = get_db()
+
+        # --------------------------------------------------
+        # CHECK EXISTING USER
+        # --------------------------------------------------
+
+        existing_user = connection.execute(
+            """
+            SELECT id
+            FROM users
+            WHERE username = ? OR email = ?
+            """,
+            (
+                username,
+                email
+            )
+        ).fetchone()
+
+        if existing_user:
+
+            connection.close()
+
+            return render_template(
+                "signup.html",
+                error="Username or email already exists."
+            )
+
+        # --------------------------------------------------
+        # HASH PASSWORD
+        # --------------------------------------------------
+
+        hashed_password = generate_password_hash(
+            password
+        )
+
+        # --------------------------------------------------
+        # CREATE USER
+        # --------------------------------------------------
+
+        connection.execute(
+            """
+            INSERT INTO users
+            (
+                username,
+                email,
+                password
+            )
+            VALUES (?, ?, ?)
+            """,
+            (
+                username,
+                email,
+                hashed_password
+            )
+        )
+
+        connection.commit()
+
+        connection.close()
+
+        # --------------------------------------------------
+        # GO TO LOGIN
+        # --------------------------------------------------
+
+        return redirect(
+            url_for("login")
+        )
+
+    return render_template(
+        "signup.html"
+    )
+
+
+# ======================================================
+# LOGIN
+# ======================================================
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    if request.method == "POST":
+
+        email = request.form.get(
+            "email",
+            ""
+        ).strip()
+
+        password = request.form.get(
+            "password",
+            ""
+        )
+
+        # --------------------------------------------------
+        # VALIDATION
+        # --------------------------------------------------
+
+        if not email or not password:
+
+            return render_template(
+                "login.html",
+                error="Please enter your email and password."
+            )
+
+        connection = get_db()
+
+        # --------------------------------------------------
+        # FIND USER
+        # --------------------------------------------------
+
+        user = connection.execute(
+            """
+            SELECT
+                id,
+                username,
+                email,
+                password
+
+            FROM users
+
+            WHERE email = ?
+            """,
+            (
+                email,
+            )
+        ).fetchone()
+
+        connection.close()
+
+        # --------------------------------------------------
+        # USER NOT FOUND
+        # --------------------------------------------------
+
+        if not user:
+
+            return render_template(
+                "login.html",
+                error="Invalid email or password."
+            )
+
+        # --------------------------------------------------
+        # CHECK PASSWORD
+        # --------------------------------------------------
+
+        if not check_password_hash(
+            user["password"],
+            password
+        ):
+
+            return render_template(
+                "login.html",
+                error="Invalid email or password."
+            )
+
+        # --------------------------------------------------
+        # CREATE SESSION
+        # --------------------------------------------------
+
+        session["user_id"] = user["id"]
+
+        session["username"] = user["username"]
+
+        session["email"] = user["email"]
+
+        # --------------------------------------------------
+        # GO TO PROFILE
+        # --------------------------------------------------
+
+        return redirect(
+            url_for("profile")
+        )
+
+    return render_template(
+        "login.html"
+    )
+
+
+# ======================================================
+# LOGOUT
+# ======================================================
+
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    return redirect(
+        url_for("home")
+    )
 
 
 # ======================================================
@@ -139,7 +399,6 @@ def explore():
         artwork_list.append(
             artwork_copy
         )
-
 
     # --------------------------------------------------
     # SUBMITTED ARTWORKS
@@ -166,9 +425,8 @@ def explore():
 
     connection.close()
 
-
     # --------------------------------------------------
-    # ADD SUBMISSIONS TO EXPLORE
+    # ADD SUBMISSIONS
     # --------------------------------------------------
 
     for row in rows:
@@ -199,11 +457,12 @@ def explore():
 
         })
 
-
     return render_template(
         "explore.html",
         artworks=artwork_list
     )
+
+
 # ======================================================
 # ABOUT
 # ======================================================
@@ -211,7 +470,9 @@ def explore():
 @app.route("/about")
 def about():
 
-    return render_template("about.html")
+    return render_template(
+        "about.html"
+    )
 
 
 # ======================================================
@@ -221,7 +482,19 @@ def about():
 @app.route("/profile")
 def profile():
 
-    return render_template("profile.html")
+    # --------------------------------------------------
+    # REQUIRE LOGIN
+    # --------------------------------------------------
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+    return render_template(
+        "profile.html"
+    )
 
 
 # ======================================================
@@ -231,7 +504,9 @@ def profile():
 @app.route("/submit")
 def submit():
 
-    return render_template("submit.html")
+    return render_template(
+        "submit.html"
+    )
 
 
 # ======================================================
@@ -246,7 +521,6 @@ def artwork():
         "wide"
     )
 
-
     # ==================================================
     # ORIGINAL ARTWORK
     # ==================================================
@@ -259,7 +533,10 @@ def artwork():
 
         rows = connection.execute(
             """
-            SELECT text, user, monos
+            SELECT
+                text,
+                user,
+                monos
 
             FROM stories
 
@@ -267,24 +544,19 @@ def artwork():
 
             ORDER BY id ASC
             """,
-            (artwork_id,)
+            (
+                artwork_id,
+            )
         ).fetchall()
 
         connection.close()
 
-
         return render_template(
-
             "artwork.html",
-
             artwork=artwork_data,
-
             artwork_id=artwork_id,
-
             stories=rows
-
         )
-
 
     # ==================================================
     # SUBMITTED ARTWORK
@@ -307,9 +579,7 @@ def artwork():
 
             return "Artwork not found", 404
 
-
         connection = get_db()
-
 
         submission = connection.execute(
             """
@@ -325,9 +595,10 @@ def artwork():
 
             WHERE id = ?
             """,
-            (submission_id,)
+            (
+                submission_id,
+            )
         ).fetchone()
-
 
         stories = connection.execute(
             """
@@ -342,17 +613,16 @@ def artwork():
 
             ORDER BY id ASC
             """,
-            (artwork_id,)
+            (
+                artwork_id,
+            )
         ).fetchall()
 
-
         connection.close()
-
 
         if not submission:
 
             return "Artwork not found", 404
-
 
         artwork_data = {
 
@@ -376,21 +646,16 @@ def artwork():
 
         }
 
-
         return render_template(
-
             "artwork.html",
-
             artwork=artwork_data,
-
             artwork_id=artwork_id,
-
             stories=stories
-
         )
 
-
     return "Artwork not found", 404
+
+
 # ======================================================
 # GET STORIES
 # ======================================================
@@ -403,10 +668,12 @@ def get_stories(artwork_id):
 
     connection = get_db()
 
-
     rows = connection.execute(
         """
-        SELECT text, user, monos
+        SELECT
+            text,
+            user,
+            monos
 
         FROM stories
 
@@ -414,30 +681,33 @@ def get_stories(artwork_id):
 
         ORDER BY id ASC
         """,
-        (artwork_id,)
+        (
+            artwork_id,
+        )
     ).fetchall()
-
 
     connection.close()
 
-
     stories = []
-
 
     for row in rows:
 
         stories.append({
 
-            "text": row["text"],
+            "text":
+                row["text"],
 
-            "user": row["user"],
+            "user":
+                row["user"],
 
-            "monos": row["monos"]
+            "monos":
+                row["monos"]
 
         })
 
-
-    return jsonify(stories)
+    return jsonify(
+        stories
+    )
 
 
 # ======================================================
@@ -452,36 +722,42 @@ def add_story(artwork_id):
 
     data = request.get_json()
 
-
     if not data:
 
         return jsonify({
-            "error": "No data received"
+            "error":
+                "No data received"
         }), 400
-
 
     story_text = data.get(
         "text",
         ""
     ).strip()
 
-
     if not story_text:
 
         return jsonify({
-            "error": "Story is empty"
+            "error":
+                "Story is empty"
         }), 400
-
 
     if artwork_id not in artworks:
 
         return jsonify({
-            "error": "Artwork not found"
+            "error":
+                "Artwork not found"
         }), 404
 
+    # --------------------------------------------------
+    # USE LOGGED-IN USER
+    # --------------------------------------------------
+
+    username = session.get(
+        "username",
+        "you"
+    )
 
     connection = get_db()
-
 
     connection.execute(
         """
@@ -495,30 +771,31 @@ def add_story(artwork_id):
 
         VALUES (?, ?, ?, ?)
         """,
-
         (
             artwork_id,
             story_text,
-            "@you",
+            "@" + username,
             0
         )
     )
-
 
     connection.commit()
 
     connection.close()
 
-
     return jsonify({
 
-        "text": story_text,
+        "text":
+            story_text,
 
-        "user": "@you",
+        "user":
+            "@" + username,
 
-        "monos": 0
+        "monos":
+            0
 
     })
+
 
 # ======================================================
 # SUBMIT ARTWORK API
@@ -549,20 +826,19 @@ def submit_artwork():
         "image"
     )
 
-
     if not title or not artist:
 
         return jsonify({
-            "error": "Title and artist are required."
+            "error":
+                "Title and artist are required."
         }), 400
-
 
     if not image:
 
         return jsonify({
-            "error": "Please select an image."
+            "error":
+                "Please select an image."
         }), 400
-
 
     # --------------------------------------------------
     # SAVE IMAGE
@@ -573,39 +849,31 @@ def submit_artwork():
         "images"
     )
 
-
     os.makedirs(
         images_folder,
         exist_ok=True
     )
 
-
     filename = image.filename
 
-
-    # Keep only the filename
     filename = os.path.basename(
         filename
     )
-
 
     image_path = os.path.join(
         images_folder,
         filename
     )
 
-
     image.save(
         image_path
     )
 
-
     # --------------------------------------------------
-    # SAVE SUBMISSION TO DATABASE
+    # SAVE SUBMISSION
     # --------------------------------------------------
 
     connection = get_db()
-
 
     connection.execute(
         """
@@ -621,7 +889,6 @@ def submit_artwork():
 
         VALUES (?, ?, ?, ?, ?, ?)
         """,
-
         (
             title,
             artist,
@@ -632,25 +899,27 @@ def submit_artwork():
         )
     )
 
-
     connection.commit()
 
     connection.close()
 
-
     return jsonify({
 
-        "success": True,
+        "success":
+            True,
 
         "message":
             "Artwork submitted successfully."
 
     })
+
+
 # ======================================================
 # START
 # ======================================================
 
 # Initialize database
+
 init_db()
 
 

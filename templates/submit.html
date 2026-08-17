@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Submit — Monochrome Society
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- ======================================================
+     NAVIGATION
+====================================================== -->
+
+<header>
+
+    <nav class="navbar">
+
+        <a
+            href="/"
+            class="logo"
+        >
+            MONOCHROME SOCIETY
+        </a>
+
+
+        <div class="nav-links">
+
+            <a href="/explore">
+                Explore
+            </a>
+
+            <a href="/submit">
+                Submit
+            </a>
+
+            <a href="/about">
+                About
+            </a>
+
+            <a href="/profile">
+                Profile
+            </a>
+
+        </div>
+
+    </nav>
+
+</header>
+
+
+
+<!-- ======================================================
+     SUBMIT PAGE
+====================================================== -->
+
+<main class="submit-page">
+
+
+    <section class="submit-header">
+
+
+        <p class="section-label">
+            ADD TO THE SOCIETY
+        </p>
+
+
+        <h1>
+            SUBMIT
+            <br>
+            YOUR ART.
+        </h1>
+
+
+        <p>
+            Have something that belongs in black,
+            white, or somewhere in between?
+            Put it in front of the society.
+        </p>
+
+
+    </section>
+
+
+
+    <!-- ==================================================
+         FORM
+    =================================================== -->
+
+    <section class="submit-form-section">
+
+
+        <form
+            id="submitForm"
+            class="submit-form"
+        >
+
+
+            <!-- ARTWORK TITLE -->
+
+            <div class="form-field">
+
+                <label for="artTitle">
+                    ARTWORK TITLE
+                </label>
+
+
+                <input
+                    type="text"
+                    id="artTitle"
+                    name="title"
+                    placeholder="Give your artwork a name..."
+                    required
+                >
+
+            </div>
+
+
+
+            <!-- ARTIST -->
+
+            <div class="form-field">
+
+                <label for="artistName">
+                    ARTIST NAME
+                </label>
+
+
+                <input
+                    type="text"
+                    id="artistName"
+                    name="artist"
+                    placeholder="@yourname"
+                    required
+                >
+
+            </div>
+
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-field">
+
+                <label for="artDescription">
+                    DESCRIPTION
+                </label>
+
+
+                <textarea
+                    id="artDescription"
+                    name="description"
+                    placeholder="Tell us a little about the artwork..."
+                    rows="5"
+                ></textarea>
+
+            </div>
+
+
+
+            <!-- IMAGE -->
+
+            <div class="form-field">
+
+                <label for="artUpload">
+                    ARTWORK IMAGE
+                </label>
+
+
+                <input
+                    type="file"
+                    id="artUpload"
+                    name="image"
+                    accept="image/*"
+                >
+
+
+                <div
+                    id="imagePreview"
+                    class="image-preview"
+                >
+
+                    <span>
+                        IMAGE PREVIEW
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- SUBMIT -->
+
+            <button
+                type="submit"
+                class="hero-button"
+            >
+                SUBMIT ARTWORK →
+            </button>
+
+
+        </form>
+
+
+    </section>
+
+
+
+    <!-- ==================================================
+         NOTE
+    =================================================== -->
+
+    <section class="submit-note">
+
+
+        <p class="section-label">
+            BEFORE YOU SUBMIT
+        </p>
+
+
+        <h2>
+            Keep it
+            <br>
+            monochrome.
+        </h2>
+
+
+        <p>
+            Black, white, grey, shadows, textures,
+            negative space — colour isn't required
+            to make something interesting.
+        </p>
+
+
+    </section>
+
+
+</main>
+
+
+
+<!-- ======================================================
+     FOOTER
+====================================================== -->
+
+<footer>
+
+    <p>
+        © 2026 MONOCHROME SOCIETY
+    </p>
+
+
+    <p>
+        BLACK · WHITE · GREY
+    </p>
+
+</footer>
+
+
+
+<script
+    src="{{ url_for('static', filename='js/script.js') }}"
+></script>
+
+
+</body>
+
+</html>

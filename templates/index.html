@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Monochrome Society
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- ======================================================
+     NAVIGATION
+====================================================== -->
+
+<header>
+
+    <nav class="navbar">
+
+        <a
+            href="/"
+            class="logo"
+        >
+            MONOCHROME SOCIETY
+        </a>
+
+
+        <div class="nav-links">
+
+            <a href="/explore">
+                Explore
+            </a>
+
+            <a href="/submit">
+                Submit
+            </a>
+
+            <a href="/about">
+                About
+            </a>
+
+            <a href="/profile">
+                Profile
+            </a>
+
+        </div>
+
+    </nav>
+
+</header>
+
+
+
+<!-- ======================================================
+     HERO
+====================================================== -->
+
+<main class="home-page">
+
+
+    <section class="hero">
+
+
+        <div class="hero-text">
+
+            <p class="section-label">
+                A DIGITAL GALLERY
+            </p>
+
+
+            <h1>
+                MONOCHROME
+                <br>
+                SOCIETY
+            </h1>
+
+
+            <p class="hero-description">
+                Art doesn't always need colour.
+                Sometimes black, white, and everything
+                between them are enough to tell a story.
+            </p>
+
+
+            <a
+                href="/explore"
+                class="hero-button"
+            >
+                ENTER THE GALLERY →
+            </a>
+
+        </div>
+
+
+
+        <!-- HERO ART -->
+
+        <div class="hero-art">
+
+            <a href="/artwork?art=mandala">
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename='images/mandala.jpg'
+                    ) }}"
+                    alt="Mandala artwork"
+                >
+
+            </a>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- ==================================================
+         INTRO
+    =================================================== -->
+
+    <section class="home-intro">
+
+
+        <p class="section-label">
+            THE IDEA
+        </p>
+
+
+        <h2>
+            One artwork.
+            <br>
+            A hundred interpretations.
+        </h2>
+
+
+        <p>
+            Monochrome Society is a space where artwork
+            doesn't come with one fixed meaning.
+            Look at it. Interpret it. Tell us what you see.
+        </p>
+
+
+    </section>
+
+
+
+    <!-- ==================================================
+         FEATURED WORK
+    =================================================== -->
+
+    <section class="home-featured">
+
+
+        <div class="featured-heading">
+
+            <div>
+
+                <p class="section-label">
+                    FEATURED WORK
+                </p>
+
+
+                <h2>
+                    Three perspectives.
+                </h2>
+
+            </div>
+
+
+            <a
+                href="/explore"
+                class="view-link"
+            >
+                VIEW ALL →
+            </a>
+
+        </div>
+
+
+
+        <div class="featured-grid">
+
+
+            <!-- WIDE -->
+
+            <a
+                href="/artwork?art=wide"
+                class="featured-card"
+            >
+
+                <div class="featured-image">
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename='images/wide-perspective.jpg'
+                        ) }}"
+                        alt="Wide Perspective"
+                    >
+
+                </div>
+
+
+                <div class="featured-info">
+
+                    <span>
+                        01
+                    </span>
+
+
+                    <h3>
+                        Wide Perspective
+                    </h3>
+
+                </div>
+
+            </a>
+
+
+
+            <!-- MANDALA -->
+
+            <a
+                href="/artwork?art=mandala"
+                class="featured-card"
+            >
+
+                <div class="featured-image">
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename='images/mandala.jpg'
+                        ) }}"
+                        alt="Mandala"
+                    >
+
+                </div>
+
+
+                <div class="featured-info">
+
+                    <span>
+                        02
+                    </span>
+
+
+                    <h3>
+                        Mandala
+                    </h3>
+
+                </div>
+
+            </a>
+
+
+
+            <!-- DEAD -->
+
+            <a
+                href="/artwork?art=dead"
+                class="featured-card"
+            >
+
+                <div class="featured-image">
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename='images/dead.jpg'
+                        ) }}"
+                        alt="Dead"
+                    >
+
+                </div>
+
+
+                <div class="featured-info">
+
+                    <span>
+                        03
+                    </span>
+
+
+                    <h3>
+                        Dead
+                    </h3>
+
+                </div>
+
+            </a>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==================================================
+         STORY CTA
+    =================================================== -->
+
+    <section class="story-cta">
+
+
+        <p class="section-label">
+            YOUR TURN
+        </p>
+
+
+        <h2>
+            What did you see?
+        </h2>
+
+
+        <p>
+            Every artwork has a story.
+            Maybe yours is different.
+        </p>
+
+
+        <a
+            href="/explore"
+            class="hero-button"
+        >
+            START EXPLORING →
+        </a>
+
+
+    </section>
+
+
+</main>
+
+
+
+<!-- ======================================================
+     FOOTER
+====================================================== -->
+
+<footer>
+
+    <p>
+        © 2026 MONOCHROME SOCIETY
+    </p>
+
+
+    <p>
+        BLACK · WHITE · GREY
+    </p>
+
+</footer>
+
+
+
+<script
+    src="{{ url_for('static', filename='js/script.js') }}"
+></script>
+
+
+</body>
+
+</html>

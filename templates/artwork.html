@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ artwork.title }} — Monochrome Society</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body data-artwork="{{ artwork_id }}">
+
+
+<header>
+
+    <nav class="navbar">
+
+        <a href="/" class="logo">
+            MONOCHROME SOCIETY
+        </a>
+
+        <div class="nav-links">
+
+            <a href="/explore">Explore</a>
+
+            <a href="/submit">Submit</a>
+
+            <a href="/about">About</a>
+
+            <a href="/profile">Profile</a>
+
+        </div>
+
+    </nav>
+
+</header>
+
+
+<main class="artwork-page">
+
+
+    <section class="artwork-main">
+
+
+        <div class="artwork-large">
+
+            <img
+                id="artImage"
+                src="{{ url_for('static', filename='images/' + artwork['image']) }}"
+                alt="{{ artwork['title'] }}"
+            >
+
+        </div>
+
+
+        <div class="artwork-information">
+
+            <p class="section-label">
+                FEATURED WORK
+            </p>
+
+
+            <h1 id="artTitle">
+                {{ artwork['title'] }}
+            </h1>
+
+
+            <p class="artist-name" id="artistName">
+                {{ artwork['artist'] }}
+            </p>
+
+
+            <div class="mono-section">
+
+                <button id="monoButton">
+
+                    ♡
+
+                    <span id="monoCount">
+                        {{ artwork['monos'] }}
+                    </span>
+
+                    MONOS
+
+                </button>
+
+            </div>
+
+
+            <div class="work-description">
+
+                <p id="artDescription">
+                    {{ artwork['description'] }}
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <section class="stories">
+
+
+        <div class="stories-heading">
+
+            <p class="section-label">
+                THE STORIES
+            </p>
+
+            <h2>
+                What did you see?
+            </h2>
+
+            <p>
+                Every viewer sees something different.
+                Tell us the story this artwork created
+                in your mind.
+            </p>
+
+        </div>
+
+
+        <div class="story-list" id="storyList">
+
+            {% for story in stories %}
+
+            <article class="story">
+
+                <p class="story-text">
+                    "{{ story['text'] }}"
+                </p>
+
+                <div class="story-meta">
+
+                    <span>
+                        {{ story['user'] }}
+                    </span>
+
+                    <span>
+                        {{ story['monos'] }} MONOS
+                    </span>
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        </div>
+
+
+
+        <div class="write-story">
+
+            <p class="section-label">
+                YOUR INTERPRETATION
+            </p>
+
+            <h3>
+                What story did you see?
+            </h3>
+
+            <textarea
+                id="storyInput"
+                placeholder="Write what this artwork made you imagine..."
+            ></textarea>
+
+            <button id="storyButton">
+                SHARE STORY →
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <section class="artist-note">
+
+        <p class="section-label">
+            ARTIST'S NOTE
+        </p>
+
+        <h2>
+            What I actually meant...
+        </h2>
+
+        <button id="revealButton">
+            REVEAL
+        </button>
+
+        <p id="artistNoteText" class="hidden-note hidden">
+            {{ artwork['artist_note'] }}
+        </p>
+
+    </section>
+
+
+</main>
+
+
+<footer>
+
+    <p>
+        © 2026 MONOCHROME SOCIETY
+    </p>
+
+    <p>
+        BLACK · WHITE · GREY
+    </p>
+
+</footer>
+
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+
+</body>
+
+</html>
+

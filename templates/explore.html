@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Explore — Monochrome Society
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <nav class="navbar">
+
+        <a
+            href="/"
+            class="logo"
+        >
+            MONOCHROME SOCIETY
+        </a>
+
+
+        <div class="nav-links">
+
+            <a href="/explore">
+                Explore
+            </a>
+
+            <a href="/submit">
+                Submit
+            </a>
+
+            <a href="/about">
+                About
+            </a>
+
+            <a href="/profile">
+                Profile
+            </a>
+
+        </div>
+
+    </nav>
+
+</header>
+
+
+
+<main class="explore-page">
+
+
+    <section class="explore-header">
+
+        <p class="section-label">
+            THE COLLECTION
+        </p>
+
+
+        <h1>
+            Explore
+        </h1>
+
+
+        <p>
+            A collection of monochrome works,
+            each open to interpretation.
+        </p>
+
+    </section>
+
+
+
+    <div class="filter-bar">
+
+        <button
+            class="filter active"
+            data-filter="all"
+        >
+            ALL
+        </button>
+
+
+        <button
+            class="filter"
+            data-filter="wide"
+        >
+            WIDE
+        </button>
+
+
+        <button
+            class="filter"
+            data-filter="mandala"
+        >
+            MANDALA
+        </button>
+
+
+        <button
+            class="filter"
+            data-filter="dead"
+        >
+            DEAD
+        </button>
+
+    </div>
+
+
+
+    <section class="explore-grid">
+
+
+        {% for artwork in artworks %}
+
+
+        <article
+            class="explore-card"
+            data-category="{{ artwork.id }}"
+        >
+
+
+            <a
+                href="/artwork?art={{ artwork.id }}"
+                class="explore-image"
+            >
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename='images/' + artwork.image
+                    ) }}"
+                    alt="{{ artwork.title }}"
+                >
+
+            </a>
+
+
+
+            <div class="explore-info">
+
+
+                <div>
+
+                    <p class="section-label">
+                        {{ artwork.id }}
+                    </p>
+
+
+                    <h2>
+                        {{ artwork.title }}
+                    </h2>
+
+
+                    <p>
+                        {{ artwork.artist }}
+                    </p>
+
+                </div>
+
+
+
+                <a
+                    href="/artwork?art={{ artwork.id }}"
+                    class="view-link"
+                >
+                    VIEW →
+                </a>
+
+
+            </div>
+
+
+        </article>
+
+
+        {% endfor %}
+
+
+    </section>
+
+
+</main>
+
+
+
+<footer>
+
+    <p>
+        © 2026 MONOCHROME SOCIETY
+    </p>
+
+
+    <p>
+        BLACK · WHITE · GREY
+    </p>
+
+</footer>
+
+
+
+<script
+    src="{{ url_for('static', filename='js/script.js') }}"
+></script>
+
+
+</body>
+
+</html>
